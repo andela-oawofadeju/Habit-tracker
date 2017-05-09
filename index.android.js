@@ -3,7 +3,9 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-
+// import Main from './src/main';
+import New from './src/new';
+import react from 'react-native';
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -11,8 +13,8 @@ import {
   Text,
   View
 } from 'react-native';
-
-export default class HabitTracker extends Component {
+AppRegistry.registerComponent('HabitTracker', () => New);
+/*export default class HabitTracker extends Component {
   render() {
     return (
       <View style={styles.container}>
@@ -48,6 +50,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
-});
+});*/
 
-AppRegistry.registerComponent('HabitTracker', () => HabitTracker);
+

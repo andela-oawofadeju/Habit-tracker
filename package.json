@@ -1,22 +1,34 @@
 {
-	"name": "HabitTracker",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
-	},
-	"dependencies": {
-		"react": "16.0.0-alpha.6",
-		"react-native": "0.44.0"
-	},
-	"devDependencies": {
-		"babel-jest": "19.0.0",
-		"babel-preset-react-native": "1.9.1",
-		"jest": "19.0.2",
-		"react-test-renderer": "16.0.0-alpha.6"
-	},
-	"jest": {
-		"preset": "react-native"
-	}
+  "name": "HabitTracker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "eslint": "^3.19.0",
+    "react": "16.0.0-alpha.6",
+    "react-native": "0.44.0",
+    "react-native-date": "^1.0.3",
+    "react-native-popup": "^0.6.1",
+    "react-native-send-intent": "^1.0.15",
+    "react-native-share": "^1.0.20",
+    "react-native-simple-store": "^1.2.0"
+  },
+  "devDependencies": {
+    "babel-jest": "19.0.0",
+    "babel-preset-react-native": "1.9.1",
+    "jest": "19.0.2",
+    "react-native-calendar-reminders": "^1.1.2",
+    "react-native-date": "^1.0.3",
+    "react-native-popup": "^0.6.1",
+    "react-native-send-intent": "^1.0.15",
+    "react-native-share": "^1.0.20",
+    "react-native-simple-store": "^1.2.0",
+    "react-test-renderer": "16.0.0-alpha.6"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
 }
