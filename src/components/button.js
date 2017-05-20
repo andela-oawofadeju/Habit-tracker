@@ -19,14 +19,14 @@ module.exports = React.createClass({
     )
   }
 });
-let styles= StyleSheet.create({
+const styles= StyleSheet.create({
   button: {
     justifyContent: 'center',
     alignSelf: 'center',
     borderWidth: 1,
-    padding: 5,
+    padding: 10,
     borderColor: '#A8CD1B',
-    margin: 10,
+    margin: 20,
   },
   buttonText: {
     color: '#005A31',
