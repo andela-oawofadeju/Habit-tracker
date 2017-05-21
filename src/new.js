@@ -1,215 +1,165 @@
-import React, { Component } from 'react';
-import react from 'react-native';
+import React from 'react-native'
+
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
   View,
-  TextInput,
-  TouchableWithoutFeedback,
-  ScrollView
-} from 'react-native';
+  StyleSheet,
+  ScrollView,
+  BackAndroid
+} from 'React';
+import store from 'react-native-simple-store';
+import Share from 'react-native-share';
+import moment from 'moment';
+import Subscribable from 'Subscribable';
+import Habit from './components/habit';
 import Button from './components/button';
 
-const today = new Date();
-const dayKey = today.getMonth().toString() + today.getDate().toString() + today.getFullYear().toString();
-let day;
+//var LinkCount = require('./components/link-count');
+import chains from './components/chains';
 
-export default class extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      habit: '',
-      checked: false,
-      days: [],
-      editHabit: true,
-    }
-  }
+export default React.createClass({
+  mixins: [Subscribable.Mixin],
 
-  saveHabit() {
-    this.setState({ habit: this.state.text, editHabit: false });
-  }
+  componentWillMount: () => {
+    this.addListenerOn(this.props.events, 'got-habits', (habits) => {
+      this.setState({habits: habits, habit: habits[habits.length - 1]});
+    });
 
-  editHabit() {
-    this.setState({ editHabit: true });
-  }
-
-  addDay() {
-    if (this.state.habit) {
-      if (this.state.days.length != 0) {
-        day = this.state.days.findIndex((day, index, days) => {
-          if (day.dayId == dayKey) {
-            return true;
-          }
-        });
+    this.addListenerOn(this.props.events, 'new-habit', (habits) => {
+      if (habits.length >= 1) {
+        this.setState({habit: habits[habits.length - 1]});
       } else {
-        day = -1;
+        this.setState({habit: {name: '', days: [], reminder: ''}});
       }
-      if (day === -1) {
-        let newDay = { dayId: dayKey, createdAt: Date.now(), habit: this.state.habit };
-        if (this.state.days === null) {
-          this.setState({ days: [newDay], checked: true });
-        } else {
-          this.state.days.push(newDay);
-          this.setState({ days: this.state.days, checked: true });
-        }
+      console.log('main new-habit event...');
+
+      this.sendData({flag: 'new-habit'});
+    });
+
+    this.addListenerOn(this.props.events, 'day-added', () => {
+      this.sendData({flag: 'day-added'});
+    });
+
+    this.addListenerOn(this.props.events, 'chain-restarted', () => {
+      this.sendData({flag: 'chain-restarted'});
+    });
+
+    this.addListenerOn(this.props.events, 'settings-saved', (settings) => {
+      this.setState({settings: settings});
+    });
+  },
+
+  componentDidMount: () => {
+    store.get('settings').then((data) => {
+      if (data === null) {
+        data = {};
       }
-    } else {
-      this.setState({ editHabit: true });
+      this.setState({settings: data});
+    });
+
+    BackAndroid.addEventListener('hardwareBackPress', () => {
+      if (this.props.navigator.getCurrentRoutes().length == 1) {
+        BackAndroid.exitApp();
+      } else {
+        return true;
+      }
+    });
+  },
+
+  getInitialState: () => {
+    return {
+      habits: [],
+      habit: {name: '', days: []},
     }
-  }
+  },
 
-  restartHabit() {
-    this.setState({ days: [], editHabit: false, checked: false });
-  }
 
-  cancelHabitEdit() {
-    this.setState({ editHabit: false });
-  }
+  onShare: () => {
+    Share.open({
+      share_text: 'Habit Progress',
+      share_URL: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress!',
+      title: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress!',
+    },(e) => {
+    });
+  },
 
-  render() {
-    let input, save;
+  openSettings: () => {
+    this.props.navigator.push({name: 'settings'});
+  },
 
-    if (!this.state.editHabit) {
-      label = <View></View>;
-      input = <View></View>;
-      save = <View></View>;
-      cancel = <View></View>;
-      restart = <View></View>;
-    } else {
-      label = <Text style={styles.label}>Enter Habit</Text>;
-      input = <TextInput style={styles.input} onChangeText={(Text) => this.setState({ text })} value={this.state.text} />;
-      save = <Button text={'Save'} onPress={() => this.saveHabit()} textType={styles.saveText} buttonType={styles.saveButton} />;
-      cancel = <Button text={'Cancel'} onPress={() => this.cancelHabitEdit()} />
-      restart = <Button text={'Restart Chain'} onPress={() => this.restartHabit()} textType={styles.restartText} buttonType={styles.restartButton} />
-    }
-    let chains;
-    if (this.state.habit) {
-      chains = <View style={styles.chains}>
-        {this.days.map((day, index) => {
-          return <Image key={day.dayId} style={styles.icon}
-            source={index % 30 == 0 && index != 0 ? require('./img/chain-icon-green.png') : require('./img/chain-icon.png')} />;
-        })}
-      </View>
-    } else {
-      chains = <View></View>;
-    }
+  openHabits: () => {
+    this.props.navigator.push({name: 'habits'});
+  },
+
+  render: () => {
     return (
       <View style={styles.container}>
-        <View style={styles.wrapper}>
-          <View style={styles.shadow}>
-            <TouchableWithoutFeedback onLongPress={() => this.editHabit()} onPress={() => this.addDay()}>
-              <View style={[styles.habit, this.state.checked && styles.checked]}>
-                <Text style={styles.habitText}>{this.state.habit ? this.state.habit : 'No habit configured...'}</Text>
-              </View>
-            </TouchableWithoutFeedback>
+        <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
+          <View style={styles.wrapper}>
+            <Habit habits={this.state.habits} events={this.props.events}/>
+
+            <LinkCount habit={this.state.habit} events={this.props.events}/>
           </View>
-          <View Style={styles.formElement}>
-            {label}
-            {input}
-            <View style={styles.editButtons}>
-              {save}
-              {cancel}
-            </View>
-            {restart}
-          </View>
-          <Text style={styles.days}>{this.state.days ? this.state.days.length : '0'} link{this.state.days.length == 1 ? '' : 's'} in the chain.</Text>
-        </View>
-        <ScrollView style={[styles.scroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200}>
-          {chains}
+
+          <Chains habits={this.state.habits} events={this.props.events}/>
         </ScrollView>
+
+        <View style={styles.buttonRow}>
+          <Button text={'Settings'} imageSrc={require('./img/gear-icon.png')} onPress={this.openSettings} textType={styles.navText} buttonType={styles.shareButton} />
+          <Button text={'Share'} imageSrc={require('./img/share-icon.png')} onPress={this.onShare} textType={styles.shareText} buttonType={styles.shareButton} />
+          <Button text={'Habits'} imageSrc={require('./img/stack-icon.png')} onPress={this.openHabits} textType={styles.navText} buttonType={styles.shareButton} />
+        </View>
       </View>
     )
-  }
-};
+  },
+});
 
-let styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#F3FAB6',
+    backgroundColor: '#045491',
   },
+
   wrapper: {
-    alignItems: 'center',
     marginTop: 40,
     justifyContent: 'center',
-  },
-  habit: {
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    borderWidth: 2,
-    borderColor: '#A8CD1B',
   },
-  shadow: {
-    shadowColor: '#CBE32D',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.7,
-    shadowRadius: 3,
-    elevation: 5,
+
+  mainScroll: {
+    height: 500
   },
-  habitText: {
-    fontSize: 12,
-    color: '#005A31',
-  },
-  Checked: {
-    backgroundColor: '#CBE32D',
-  },
-  input: {
-    padding: 4,
-    height: 40,
-    color: '#005A31',
-    borderColor: '#A8CD1B',
-    borderRadius: 5,
-    margin: 6,
-    width: 200,
-    alignSelf: 'center',
-  },
-  formElement: {
-    backgroundColor: '#CBE32D',
-    margin: 5,
-  },
-  label: {
-    alignSelf: 'center',
-    justifyContent: 'center',
-    fontSize: 12,
-    marginTop: 30,
-  },
-  days: {
-    color: '#005A31',
-    padding: 10,
-    fontSize: 14,
-  },
-  icon: {
-    padding: 0,
-  },
-  scroll: {
-    height: 600,
-  },
-  chains: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 5,
-    overflow: 'visible',
-    borderColor: '#A8CD1B',
+
+  share: {
+    marginBottom: 15,
+    marginTop: 15,
+    paddingTop: 5,
+    borderColor: '#DFD9B9',
     borderWidth: 1,
-  },
-  restartButton: {
-    borderColor: '#A8CD1B',
-  },
-  restartText: {
-    color: '#005A31',
-  },
-  saveButton: {
-    borderColor: '#A8CD1B',
-  },
-  saveText: {
-    color: '#005A31',
-  },
-  editButtons: {
-    flexDirection: 'row',
-    flex: 2,
+    width: 45,
     alignSelf: 'center',
     justifyContent: 'center',
+  },
+
+  shareButton: {
+    borderColor: '#DFD9B9',
+    borderRadius: 0
+  },
+
+  shareText: {
+    textAlign: 'center',
+    color: '#DFD9B9',
+    paddingTop: 2
+  },
+
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+
+  navText: {
+    textAlign: 'center',
+    color: '#DFD9B9',
+    fontSize: 12
   },
 });
