@@ -1,24 +1,25 @@
-var React = require('react-native');
-var {
+import React from 'react-native'
+
+import {
   View,
   StyleSheet,
   ScrollView,
   BackAndroid
-} = React;
-var store = require('react-native-simple-store');
-var Share = require('react-native-share');
-var moment = require('moment');
-var Subscribable = require('Subscribable');
+} from 'React';
+import store from 'react-native-simple-store';
+import Share from 'react-native-share';
+import moment from 'moment';
+import Subscribable from 'Subscribable';
+import Habit from './components/habit';
+import Button from './components/button';
 
-var Habit = require('./components/habit');
-var Button = require('./components/button');
 //var LinkCount = require('./components/link-count');
-var Chains = require('./components/chains');
+import chains from './components/chains';
 
-module.exports = React.createClass({
+export default React.createClass({
   mixins: [Subscribable.Mixin],
 
-  componentWillMount: function() {
+  componentWillMount: () => {
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
       this.setState({habits: habits, habit: habits[habits.length - 1]});
     });
@@ -47,7 +48,7 @@ module.exports = React.createClass({
     });
   },
 
-  componentDidMount: function() {
+  componentDidMount: () => {
     store.get('settings').then((data) => {
       if (data === null) {
         data = {};
@@ -64,56 +65,32 @@ module.exports = React.createClass({
     });
   },
 
-  getInitialState: function() {
+  getInitialState: () => {
     return {
       habits: [],
       habit: {name: '', days: []},
     }
   },
 
-  sendData: function(options) {
-    console.log('sendData options:', options);
-    if (this.state.settings.url !== undefined &&
-        this.state.settings.url != '' &&
-        this.state.settings.username !== undefined &&
-        this.state.settings.username != '') {
-      fetch(this.state.settings.url, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({username: this.state.settings.username, habits: this.state.habits, options: options})
-      })
-        .then((response) => response.text())
-        .then((responseText) => {
-          //console.log('responseText:', responseText);
-        })
-        .catch((error) => {
-          // console.log('sendData fetch error:', error);
-        });
-    }
-  },
 
-  onShare: function() {
+  onShare: () => {
     Share.open({
       share_text: 'Habit Progress',
-      share_URL: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
-      title: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress! #thehoickhabitapp',
-    },function(e) {
-      // console.log(e);
+      share_URL: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress!',
+      title: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress!',
+    },(e) => {
     });
   },
 
-  openSettings: function() {
+  openSettings: () => {
     this.props.navigator.push({name: 'settings'});
   },
 
-  openHabits: function() {
+  openHabits: () => {
     this.props.navigator.push({name: 'habits'});
   },
 
-  render: function() {
+  render: () => {
     return (
       <View style={styles.container}>
         <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
@@ -136,7 +113,7 @@ module.exports = React.createClass({
   },
 });
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
