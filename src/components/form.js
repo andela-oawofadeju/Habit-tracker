@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import react from 'react-native';
-import events from 'events';
 import {
   StyleSheet,
   TouchableWithoutFeedback,
   Image,
   Text,
-  View
+  View,
 } from 'react-native';
 import store from 'react-native-simple-store';
 import button from './button';
 import Subscribable from 'Subscribable';
+import events from 'events';
 
 export default React.createClass({
   mixin: [Subscribable.mixin],
@@ -82,8 +81,8 @@ return(
   {cancel}
   </View>
   </View>
-)
-}
+);
+},
 });
 
 const styles = StyleSheet.create({
@@ -121,5 +120,5 @@ const styles = StyleSheet.create({
     flex: 2,
     alignSelf: 'center',
     justifyContent: 'center'
-  }
-})
+  },
+});

@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import react from 'react-native';
 import {
   StyleSheet,
   TouchableHighlight,
   Image,
   Text,
-  View
+  View,
 } from 'react-native';
+import events from 'events';
 
-module.exports = React.createClass({
+export default React.createClass({
   render: () => {
     return(
     <TouchableHighlight style={[styles.button, styles.button]} underlayColor={'gray'}>

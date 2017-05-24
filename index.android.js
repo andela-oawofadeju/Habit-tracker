@@ -5,10 +5,10 @@
  */
 // import Main from './src/main';
 import React, { Component } from 'react';
-import { AppRegistry } from 'react-native';
-import New from './src/new';
+import react, { AppRegistry } from 'react-native';
+import MainClass from './src/new';
 
-AppRegistry.registerComponent('HabitTracker', () => New);
+AppRegistry.registerComponent('HabitTracker', () => MainClass);
 
 
 

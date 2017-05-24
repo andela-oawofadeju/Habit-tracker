@@ -8,7 +8,7 @@
         "jasmine": true
     },
     "rules": {
-        "indent": [1, 4],
+        "indent": [1, 2],
         "no-console": 0,
         "no-unused-vars": [1, {"vars": "local", "args": "none"}],
         "react/forbid-prop-types": 1,
@@ -41,7 +41,10 @@
         "react/wrap-multilines": 1,
         "id-length": 0
     },
+    "parserOptions": {
     "ecmaFeatures": {
-      "jsx": true
+        "jsx": true,
+        "modules": true
     }
+}
 }

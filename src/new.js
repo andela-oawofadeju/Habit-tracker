@@ -1,27 +1,32 @@
-import React from 'react-native'
-
+import React, { Component } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
-  BackAndroid
-} from 'React';
+  BackAndroid,
+} from 'react-native';
+import EventEmitter from 'EventEmitter';
+import events from 'events';
 import store from 'react-native-simple-store';
 import Share from 'react-native-share';
 import moment from 'moment';
-import Subscribable from 'Subscribable';
+import Subscribable from 'subscribable';
 import Habit from './components/habit';
 import Button from './components/button';
+import LinkCount from './components/link-count';
 
-//var LinkCount = require('./components/link-count');
-import chains from './components/chains';
-
+// import Chains from './components/chains';
 export default React.createClass({
   mixins: [Subscribable.Mixin],
 
-  componentWillMount: () => {
+  componentWillMount() {
+    console.log(this);
+    this.eventEmitter = new EventEmitter();
+  },
+
+  componentDidMount() {
     this.addListenerOn(this.props.events, 'got-habits', (habits) => {
-      this.setState({habits: habits, habit: habits[habits.length - 1]});
+      this.setState({ habits: habits, habit: habits[habits.length - 1] });
     });
 
     this.addListenerOn(this.props.events, 'new-habit', (habits) => {
@@ -46,17 +51,16 @@ export default React.createClass({
     this.addListenerOn(this.props.events, 'settings-saved', (settings) => {
       this.setState({settings: settings});
     });
-  },
 
-  componentDidMount: () => {
+
     store.get('settings').then((data) => {
       if (data === null) {
         data = {};
       }
-      this.setState({settings: data});
+      this.setState({ settings: data });
     });
 
-    BackAndroid.addEventListener('hardwareBackPress', () => {
+    BackAndroid.addEventListener('hardwareBackPress', function() {
       if (this.props.navigator.getCurrentRoutes().length == 1) {
         BackAndroid.exitApp();
       } else {
@@ -65,42 +69,96 @@ export default React.createClass({
     });
   },
 
-  getInitialState: () => {
+  getInitialState() {
     return {
       habits: [],
-      habit: {name: '', days: []},
-    }
+      habit: { name: '', days: [] },
+    };
   },
 
 
-  onShare: () => {
+  onShare() {
     Share.open({
       share_text: 'Habit Progress',
       share_URL: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress!',
       title: 'For my ' + this.state.habit.name + ' habit I have done ' + this.state.habit.days.length + ' days in a row.  Yay for progress!',
-    },(e) => {
     });
   },
 
-  openSettings: () => {
+  openSettings() {
     this.props.navigator.push({name: 'settings'});
   },
 
-  openHabits: () => {
+  openHabits() {
     this.props.navigator.push({name: 'habits'});
   },
 
-  render: () => {
+  render () {
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      backgroundColor: '#045491',
+    },
+
+    wrapper: {
+      marginTop: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    mainScroll: {
+      height: 500,
+    },
+
+    share: {
+      marginBottom: 15,
+      marginTop: 15,
+      paddingTop: 5,
+      borderColor: '#DFD9B9',
+      borderWidth: 1,
+      width: 45,
+      alignSelf: 'center',
+      justifyContent: 'center',
+    },
+
+    shareButton: {
+      borderColor: '#DFD9B9',
+      borderRadius: 0,
+    },
+
+    shareText: {
+      textAlign: 'center',
+      color: '#DFD9B9',
+      paddingTop: 2,
+    },
+
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+
+    navText: {
+      textAlign: 'center',
+      color: '#DFD9B9',
+      fontSize: 12,
+    },
+  });
+
     return (
       <View style={styles.container}>
         <ScrollView style={[styles.mainScroll]} automaticallyAdjustContentInsets={true} scrollEventThrottle={200} showsVerticalScrollIndicator={false}>
           <View style={styles.wrapper}>
-            <Habit habits={this.state.habits} events={this.props.events}/>
+            <Habit habits={this.state.habits}
+                events={this.eventEmitter}/>
 
-            <LinkCount habit={this.state.habit} events={this.props.events}/>
+            <LinkCount habit={this.state.habit} 
+                events={this.eventEmitter}/>
           </View>
 
-          <Chains habits={this.state.habits} events={this.props.events}/>
+      {/** <Chains habits={this.state.habits} 
+              events={this.eventEmitter}/> **/ }
         </ScrollView>
 
         <View style={styles.buttonRow}>
@@ -113,53 +171,3 @@ export default React.createClass({
   },
 });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#045491',
-  },
-
-  wrapper: {
-    marginTop: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  mainScroll: {
-    height: 500
-  },
-
-  share: {
-    marginBottom: 15,
-    marginTop: 15,
-    paddingTop: 5,
-    borderColor: '#DFD9B9',
-    borderWidth: 1,
-    width: 45,
-    alignSelf: 'center',
-    justifyContent: 'center',
-  },
-
-  shareButton: {
-    borderColor: '#DFD9B9',
-    borderRadius: 0
-  },
-
-  shareText: {
-    textAlign: 'center',
-    color: '#DFD9B9',
-    paddingTop: 2
-  },
-
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'center'
-  },
-
-  navText: {
-    textAlign: 'center',
-    color: '#DFD9B9',
-    fontSize: 12
-  },
-});
