@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
-import react from 'react-native';
 import {
   StyleSheet,
   TouchableHighlight,
   Image,
   Text,
-  View
+  View,
 } from 'react-native';
+import events from 'events';
 
-module.exports = React.createClass({
+export default React.createClass({
   render: () => {
     return(
     <TouchableHighlight style={[styles.button, styles.button]} underlayColor={'gray'}>
@@ -19,14 +19,14 @@ module.exports = React.createClass({
     )
   }
 });
-let styles= StyleSheet.create({
+const styles= StyleSheet.create({
   button: {
     justifyContent: 'center',
     alignSelf: 'center',
     borderWidth: 1,
-    padding: 5,
+    padding: 10,
     borderColor: '#A8CD1B',
-    margin: 10,
+    margin: 20,
   },
   buttonText: {
     color: '#005A31',
