@@ -6,7 +6,7 @@
 // import Main from './src/main';
 import React, { Component } from 'react';
 import react, { AppRegistry } from 'react-native';
-import MainClass from './src/new';
+import MainClass from './src/index';
 
 AppRegistry.registerComponent('HabitTracker', () => MainClass);
 
