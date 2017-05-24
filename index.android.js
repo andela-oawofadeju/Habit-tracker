@@ -14,7 +14,7 @@ import {
   View
 } from 'react-native';
 AppRegistry.registerComponent('HabitTracker', () => New);
-/*export default class HabitTracker extends Component {
+export default class HabitTracker extends Component {
   render() {
     return (
       <View style={styles.container}>
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
-});*/
+});
 
 
